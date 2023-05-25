@@ -8,8 +8,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import static com.bhardwaj.services.epay.constants.UserConstants.ADMIN_AUTHORITY;
-import static com.bhardwaj.services.epay.constants.UserConstants.USER_AUTHORITY;
+import static com.bhardwaj.services.epay.constants.UserConstants.*;
 
 @Configuration
 public class UserSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -24,11 +23,14 @@ public class UserSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .httpBasic()
+                .and()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user/**").permitAll() //sign up of new account
                 .antMatchers("/user/**").hasAuthority(USER_AUTHORITY) // user driven actions
-                .antMatchers("/**").hasAuthority(ADMIN_AUTHORITY) //admin driven actions
+                .antMatchers("/**").hasAnyAuthority(ADMIN_AUTHORITY, SERVICE_AUTHORITY) //admin driven actions
                 .and()
                 .formLogin();
     }
